@@ -1,0 +1,88 @@
+# # Core libraries
+# numpy==1.26.4
+# pandas==2.0.1
+# datetime==5.4
+
+# # Streamlit and extensions
+# streamlit==1.41.1
+# streamlit-folium==0.19.4
+
+# # Geospatial libraries
+# geopandas==1.0.1
+# shapely==2.0.6
+# folium==0.19.4
+# branca==0.8.0
+# pyproj==3.7.0
+# pyogrio==0.10.0
+
+# # Machine Learning & Data Processing
+# scikit-learn==1.4.2
+# joblib==1.4.2
+# xgboost==2.1.2
+# statsmodels==0.13.5
+# threadpoolctl==3.5.0
+# scipy==1.14.1
+
+# # Visualization Libraries
+# bokeh==2.4.3
+# seaborn==0.12.2
+# matplotlib==3.7.1
+# plotly==5.24.1
+
+# # Web & API Requests
+# requests==2.32.3
+# openmeteo-requests==1.0.0  # Assuming correct package name
+# retrying==1.3.4
+
+# # Miscellaneous utilities
+# jinja2==3.1.4
+# requests-cache==1.2.0
+# folium==0.19.4
+# tenacity==9.0.0
+# werkzeug==3.0.6
+# Core libraries
+# Core libraries
+numpy==1.26.4
+pandas==2.0.1
+datetime
+tabulate
+
+# Streamlit and extensions
+streamlit
+streamlit-folium
+
+# Geospatial libraries
+geopandas
+shapely
+folium
+branca
+pyproj
+pyogrio
+
+# Machine Learning & Data Processing
+scikit-learn==1.2.2
+joblib==1.4.2
+xgboost==2.1.2
+statsmodels==0.13.5
+threadpoolctl==3.5.0
+scipy==1.14.1
+
+# Visualization Libraries
+bokeh==2.4.3
+seaborn
+matplotlib
+plotly
+
+# Web & API Requests
+requests
+openmeteo-requests
+retrying
+retry-requests
+
+# Miscellaneous utilities
+jinja2
+requests-cache
+tenacity
+werkzeug
+
+
