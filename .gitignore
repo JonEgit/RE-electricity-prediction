@@ -137,6 +137,7 @@ dmypy.json
 # Data 
 #data/
 models/*
+!.gitkeep 
 modules/__pycache__
 app.log
 create_req_file.py
