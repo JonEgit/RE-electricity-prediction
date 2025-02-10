@@ -41,7 +41,7 @@ How to use this repository:
     1. install required packages:
         1. `pip install -r requirements.txt`
 
-1. Train the **model** and the **scaler** by opening the jupyter notebook in the main folder and run the code (start the training). This will take about ~ 2-10 minutes. This only needs to be done once since **model** and **scaler** will be saved in the *models/* folder as pkl-file.
+1. Train the **model** and the **scaler** by opening the jupyter notebook in the main folder and run the code (start the training). This will take about ~ 1-5 minutes (depending on your machine). This only needs to be done once since **model** and **scaler** will be saved in the *models/* folder as pkl-file.
     1. Open and run **model_training.ipynb** in your preferred IDE
 1. Go back to your terminal to start the app/dashboard. Make sure your still in your repository folder and your virtual environment is activated. The app will be hosted locally on your machine and open in your standard browser. The first time it loads will take a bit of time. If possible use a bigger screen. Overlapping might occur on smaller screens. Start the streamlit app by running:
     1. `streamlit run Dashboard.py`
