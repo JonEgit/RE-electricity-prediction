@@ -68,7 +68,7 @@ predictions_df = pd.DataFrame(st.session_state.predictions, columns=target_colum
 
 # Load consumption data
 if 'consumption_df' not in st.session_state:
-    consumption_df = pd.read_csv('data/consumption_9y.csv', sep=',')
+    consumption_df = pd.read_csv('data/consumption.csv', sep=',')
     st.session_state.consumption_df = consumption_df
 
 # Load GeoJSON file and installed capacity for federal states
