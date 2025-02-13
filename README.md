@@ -30,7 +30,7 @@ The goal of this repository is to present the final product, it contains the fol
 1. Additional ressources/assets for the dashboard
 
 ## How to set up and use this repository
-1. Download (copy) repository to a folder in your local machine  and keep the folder structure.
+1. Download / Clone (copy SSH) repository to a folder in your local machine  and keep the folder structure.
 1. Open a terminal and navigate to the newly created folder
 1. Use the terminal to prepare your repo:
     1. For this project python 3.11.3 was used. To function properly it is advised to use the same version 
