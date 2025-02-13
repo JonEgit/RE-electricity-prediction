@@ -9,12 +9,17 @@ import os
 
 
 class BindColormap(MacroElement):
-    """Binds a colormap to a given layer.
+    """Binds a colormap legend to a specific GeoJson layer on a Folium map.
 
-    Parameters
-    ----------
-    colormap : branca.colormap.ColorMap
-        The colormap to bind.
+    This class dynamically toggles the visibility of the colormap legend based on the visibility 
+    of its corresponding layer (e.g., when the user switches layers in the map control).
+
+    Args:
+        layer (folium.FeatureGroup): The map layer to which the colormap should be bound.
+        colormap (branca.colormap.ColorMap): The colormap object to be displayed alongside the layer.
+
+    Inherits:
+        folium.elements.MacroElement: Extends Folium's MacroElement to embed custom JavaScript behavior.
     """
     def __init__(self, layer, colormap):
         super(BindColormap, self).__init__()
@@ -45,7 +50,26 @@ class BindColormap(MacroElement):
         {% endmacro %}
         """)
 
-def create_map(data, date_choice, df_offshore): # predictions_df    
+
+
+
+def create_map(data, date_choice, df_offshore):
+    """Creates an interactive Folium map visualizing regional wind and solar electricity production.
+
+    This function:
+    - Generates a Folium map displaying wind and solar electricity production for a selected date.
+    - Uses colormaps to represent regional production levels on a GeoJson layer.
+    - Adds custom turbine markers for offshore wind production (North Sea and Baltic Sea).
+    - Includes interactive layer switching and dynamic colormap legends.
+
+    Args:
+        data (gpd.GeoDataFrame): GeoDataFrame containing regional wind and solar contributions with date-specific columns.
+        date_choice (str): Date string in the format '%d/%m/%y' representing the selected date for visualization.
+        df_offshore (pd.DataFrame): DataFrame containing offshore wind production values for the selected date.
+
+    Returns:
+        folium.Map: An interactive Folium map object with wind and solar electricity visualizations.
+    """    
 
     # Resolve the absolute path to the turbine icon
     script_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of create_map.py
@@ -56,16 +80,14 @@ def create_map(data, date_choice, df_offshore): # predictions_df
         raise FileNotFoundError(f"Turbine icon not found at {icon_path}")
 
     # Set initial map location and zoom level
-    m = folium.Map(location=[53.1657, 10.4515], zoom_start=5, tiles='Cartodb Positron') # , width='100%' # 'cartodbdark_matter'; 'Cartodb Positron', width='80%', height='80%'
-    # 'north_sea': [54.433, 6.317],  # Albatros coordinates for the North Sea
-    #     'baltic_sea': [54.834, 14.068],
+    m = folium.Map(location=[53.1657, 10.4515], zoom_start=5, tiles='Cartodb Positron') # 'cartodbdark_matter'; 'Cartodb Positron', width='80%', height='80%'
+
     # Define base colormaps for both layers
     solar_colormap = linear.YlOrRd_09.scale(data[f'solar_contribution_{date_choice}'].min(), data[f'solar_contribution_{date_choice}'].max())
     solar_colormap.caption = f"Solar Electricity Production [GWh]" # on {date_choice}
-    # solar_colormap.caption_style = {'color': 'white'}
+
     wind_colormap = linear.YlGnBu_09.scale(data[f'wind_contribution_{date_choice}'].min(), data[f'wind_contribution_{date_choice}'].max())
     wind_colormap.caption = f"Wind Electricity Production [GWh]"  # on {date_choice}
-    # wind_colormap.caption_style = {'color': 'white'}
 
     # Add wind contribution layer (default active)
     wind_layer = folium.FeatureGroup(name='Wind Contribution', control=True, overlay=True, show=True).add_to(m)
@@ -116,14 +138,15 @@ def create_map(data, date_choice, df_offshore): # predictions_df
 
     # Approximate coordinates for North Sea and Baltic Sea
     offshore_coordinates = {
-        'north_sea': [54.433, 6.317],  # Albatros coordinates for the North Sea
-        'baltic_sea': [54.834, 14.068],  # Approximate coordinates for the Baltic Sea
+        'north_sea': [54.433, 6.317],  # 'Albatros' windpark coordinates for the north Sea
+        'baltic_sea': [54.834, 14.068], # 'Wikinger' windpark coordinates for the baltic Sea
     }
 
+    # ensure that date and date_choice are in correct format
     formatted_date_choice = pd.to_datetime(date_choice).strftime('%d/%m/%y')
     df_offshore_filtered = df_offshore[df_offshore['date'] == formatted_date_choice]
 
-        # Add markers for North Sea and Baltic Sea with dynamic values based on date_choice
+    # Add markers for North Sea and Baltic Sea with dynamic values based on date_choice
     for _, row in df_offshore_filtered.iterrows():
         folium.Marker(
             location=offshore_coordinates[row['region']],

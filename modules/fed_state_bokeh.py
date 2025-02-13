@@ -7,14 +7,26 @@ from bokeh.models import ColumnDataSource, HoverTool, Span
 
 
 def create_fed_state_production_plot(geo_df, state_choice, df_offshore):
-    # # create dataframe of geo_pred function and predictions dataframe
-    # geo_pred = geo_pred(gdf, predictions_df)
+    """Generates a Bokeh bar plot showing wind and solar electricity production for a selected federal state or offshore region.
+
+    This function:
+    - Visualizes daily wind and solar electricity contributions for a selected German federal state or offshore region (North Sea or Baltic Sea).
+    - Handles data extraction and transformation for both onshore (from `geo_df`) and offshore (from `df_offshore`) production data.
+    - Creates a grouped bar plot using Bokeh, with wind and solar production displayed side-by-side for each day.
+
+    Args:
+        geo_df (gpd.GeoDataFrame): GeoDataFrame containing wind and solar electricity contributions for German federal states.
+        state_choice (str): Name of the federal state (e.g., "Bavaria") or offshore region ("North Sea", "Baltic Sea") to visualize.
+        df_offshore (pd.DataFrame): DataFrame containing daily offshore wind and solar electricity production data.
+
+    Returns:
+        bokeh.plotting.figure: A Bokeh bar plot comparing wind and solar electricity production for the selected state or region.
+    """
 
     # Filter data for the specified federal state
     if state_choice in ['North Sea', 'Baltic Sea']:
         # Handle offshore regions
         federal_state = df_offshore[df_offshore['region'] == state_choice.lower().replace(' ', '_')]
-        # federal_state['date'] = pd.to_datetime(federal_state['date'], format='%d/%m/%y')
         dates = federal_state['date'].tolist()
         wind_contributions = federal_state['calculated_windpower'].tolist()
         solar_contributions = federal_state['solar_pv'].tolist()
@@ -65,7 +77,7 @@ def create_fed_state_production_plot(geo_df, state_choice, df_offshore):
         p.text(x=date, y=wind - (wind * 0.1), text=[f"{wind:.2f}"], text_align="center", text_baseline="middle", text_color="white")
         p.text(x=date, y=solar - (solar * 0.1), text=[f"{solar:.2f}"], text_align="center", text_baseline="middle", text_color="white")
 
-
+    # adjust plot style and labels
     p.title.text_color = "white"
     p.title.text_font_size = "14pt"
     p.xaxis.axis_label = "Date"
@@ -94,7 +106,6 @@ def create_fed_state_production_plot(geo_df, state_choice, df_offshore):
     vertical_line = Span(location=3, dimension='height', line_color='white', line_dash='dashed', line_width=1)
     p.add_layout(vertical_line)
 
-    # Show the plot
     return p
 
 # Example usage:

@@ -5,13 +5,31 @@ from bokeh.transform import dodge
 import matplotlib.cm as colormaps
 from bokeh.colors.rgb import RGB
 
-
-# Creating a DataFrame from the given CO2 gramms table
-# original value is gCO2/KWh; predicted values are in GWh
-# gCO2/GWh = gCO2/KWh*1000*1000
-# tCO2/GWh = gCO2/GWh/1000/1000
-# original values can be kept - units are changed to tonns of CO2/GWh but don't need to be transformed
 def saved_emissions(predictions_df, date_choice):
+    """Generates a Bokeh stacked bar plot showing CO2 savings from renewable electricity production.
+
+    This function:
+    - Estimates CO2 emissions avoided by wind and solar electricity production for a specific day.
+    - Uses predefined emission factors for gas, coal, and lignite.
+    - Visualizes the CO2 savings as a stacked bar plot for each fossil fuel type.
+
+    Args:
+        predictions_df (pd.DataFrame): DataFrame containing predicted wind and solar electricity production 
+                                       with 'windpower' and 'solar_pv' columns.
+        date_choice (str): Date string in the format '%d/%m/%y' representing the day for which CO2 savings are visualized.
+
+    Returns:
+        bokeh.plotting.figure: A Bokeh stacked bar plot showing CO2 savings in kilotons for different fossil fuels.
+    """
+
+    # create co2 emission data per energy carrier (gas, coal, lignite)
+    # source: Umweltbundesamt (sekundärquelle mit verlinkung zur primärdatei: https://www.volker-quaschning.de/datserv/CO2-spez/index.php)
+    
+    # Creating a dictionary from the given CO2 emission values
+    # original value is gCO2/KWh; predicted values are in GWh
+    # gCO2/GWh = gCO2/KWh*1000*1000
+    # tCO2/GWh = gCO2/GWh/1000/1000
+    # original values can be kept - units are changed to tonns of CO2/GWh - they don't need to be transformed  
     data = {
         'tco2_gwh': [358, 867, 1049],
         # 'co2_mwh': [358000, 867000, 1049000],
@@ -21,7 +39,9 @@ def saved_emissions(predictions_df, date_choice):
 
     df_co2 = pd.DataFrame(data, index=index)
     
+    # make a copy and ensure original predictions dataframe is unchanged
     predictions_df_adj = predictions_df.copy()
+    # ensure date is a datetime element
     predictions_df_adj.index = predictions_df_adj.index.strftime('%d/%m/%y')
     # # Converting the values from grams to kilograms for each unit
     # df_kg = df_co2 / 1000
@@ -39,7 +59,7 @@ def saved_emissions(predictions_df, date_choice):
         predictions_df_adj[f'co2_saved_wind_{fossil}'] = predictions_df_adj['windpower'] * co2_per_gwh
         predictions_df_adj[f'co2_saved_solar_{fossil}'] = predictions_df_adj['solar_pv'] * co2_per_gwh
 
-    # Select a specific day to visualize
+    # fetch the selected day from session state to visualize
     day_to_plot = date_choice
 
     # Prepare data for Bokeh plot
@@ -103,6 +123,5 @@ def saved_emissions(predictions_df, date_choice):
     ]
     p.add_tools(hover)
 
-    # Show the plot
     return p
 

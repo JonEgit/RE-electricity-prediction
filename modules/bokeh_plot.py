@@ -9,14 +9,14 @@ import matplotlib.cm as colormaps
 # output_notebook()
 
 def generate_energy_forecast_plot(predictions_df, consumption_df):
-    """
-    Generates an energy forecast plot showing renewable energy production versus average consumption.
+    """Creates a Bokeh plot showing renewable electricity production forecasts against average electricity consumption.
 
-    Parameters:
-    - forecast_days (int): Number of days for weather forecast.
-    - model_path (str): Path to the pre-trained model file.
-    - consumption_data_path (str): Path to the CSV file with average consumption data.
-    - output_html_path (str): Path to save the output HTML file of the plot.
+    Args:
+        predictions_df (pd.DataFrame): Forecast data with 'windpower', 'solar_pv', and 'date' columns.
+        consumption_df (pd.DataFrame): Approximation of average consumption data with 'calendar_day' and weekday/weekend values.
+
+    Returns:
+        bokeh.plotting.figure: Bokeh plot visualizing production and consumption with surplus/deficit shading.
     """
 
     predictions_df = predictions_df.reset_index()

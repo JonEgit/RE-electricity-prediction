@@ -1,4 +1,4 @@
-# Prediction of Electricity Production - Streamlit App Dashboard
+# Prediction of Electricity Production - Streamlit Dashboard
 
 # load packages
 import pandas as pd
@@ -34,31 +34,38 @@ st.set_page_config(
 st.sidebar.title("Navigation")
 st.sidebar.markdown("Use the controls below to filter the data:")
 
+# Main title
 st.title("Renewable Electricity Outlook: Wind & Solar Forecast", anchor='left', help='Predictions for renewable electricity.')
 
-# checks if get_weather_forecast is up to date or if needs to be reloaded because the date changed
+# checks if the weather data is up to date or if needs to be reloaded because a date change
+# it saves the output 'weather_data' of the openMeteo API as dataframe in streamlit session_state
+# standard setting is to fetch 7 predicted and 3 past days of weather conditions   
+# see openMeteo_API.py for more information
 refresh_data_if_needed()
-
-# the following two lines are now used in refresh_data_if_needed() and weather_data is stored in st.session_state
-# # get the weather data from openMeteo
-# weather_data = get_weather_forecast(7, 3)
 
 weather_data = st.session_state.weather_data
 
+# check if preprocessed data 'prep' is already in session_state; if not, calculate and store it in session_state
 # preprocess the weather data
+# see preprocessing.py for more information
 if 'prep' not in st.session_state:
     prep = preprocess_weather_data(weather_data)
     st.session_state.prep = prep
 
+# use the pretrained scaler on the preprocessed weather data
+# see preprocessing.py for more information
 prep_data = scaling(st.session_state.prep)
+
 # load trained model
-# @st.cache_resource used in external script 
+# see model_forecast.py for more information
 model = load_model()
 
 # predict energy production
 target_columns = ['windpower', 'solar_pv']
 
-# Check if predictions are in session_state; if not, calculate and store them
+# check if predictions are in session_state; if not, calculate and store them
+# check if prediction data 'predictions' is already in session_state; if not, calculate and store it in session_state
+# see model_forecast.py for more information
 if 'predictions' not in st.session_state:
     predictions = predict_energy_production(model, prep_data, target_columns)
     st.session_state.predictions = predictions
@@ -66,20 +73,23 @@ if 'predictions' not in st.session_state:
 #Create a DataFrame for predicted energy production
 predictions_df = pd.DataFrame(st.session_state.predictions, columns=target_columns, index=prep_data.index)
 
+# check if consumption data 'consumption_df' is already in session_state; if not, load and store it in session_state
+# only needed for a reference value presented in the dashboard, not for predictions 
 # Load consumption data
 if 'consumption_df' not in st.session_state:
     consumption_df = pd.read_csv('data/consumption.csv', sep=',')
     st.session_state.consumption_df = consumption_df
 
-# Load GeoJSON file and installed capacity for federal states
+# Load GeoJSON file and the nominal installed capacity for federal states in germany (as of november 2024)
 gdf = gpd.read_file('data/nominal_production_geo.geojson')
-
+# calculates contributions of wind and pv electricity per federal state in germany based on nominal installed capacities 
+# and the electricity predictions. This is an approximation to present the possibilities of the dashboard 
+# if regional data would be accessible to train the model
+# see geopredictions.py for more information
 geo_df = geo_pred(gdf, predictions_df)
 
 ################ STREAMLIT APP #######################
 
-# Streamlit app
-# def main():
 
 # Sidebar for date and state selection
 st.sidebar.markdown("<hr>", unsafe_allow_html=True)
@@ -92,7 +102,7 @@ st.sidebar.markdown("<p style='font-size: 12px; color: grey;'>Choose a federal s
 
 st.sidebar.markdown("<hr>", unsafe_allow_html=True)
 
-# Download Options for Data
+# Download options for data in the sidebar
 st.sidebar.markdown("### Download Data")
 selected_download = st.sidebar.selectbox(label='Choose data to download', options=['Predictions Data', 'Geo Data'])
 
@@ -102,20 +112,22 @@ elif selected_download == 'Geo Data':
     st.sidebar.download_button(label='Download Geo Data', data=geo_df.to_csv(), file_name='geo_data.csv', mime='text/csv')
 
 
-# put offshore data in session_state
+# load offshore data and save in session_state
+# this data was not considered in geo_df and needs to be added manually
+# see offshore.py for more information
 if 'df_offshore' not in st.session_state:
     df_offshore = create_offshore_dataframe(predictions_df)
     st.session_state.df_offshore = df_offshore
 
 
-
-##### ICONS ######
+######## Weather ICONS ########
+# create weather icons from the loaded open meteo weather data
+# this is only for dashboard design and completeness but not needed for the model predictions
 weather = st.session_state.prep.reset_index()
 df = pd.DataFrame(weather)
 df['date'] = pd.to_datetime(df['date'])
 
-### weather icons within a slider window
-
+######## Icons Version 1: Bigger weather icons within a slider window ########
 st.markdown("")
 
 st.markdown("""
@@ -190,7 +202,9 @@ for i, row in df.iloc[start_index:end_index].iterrows():
 # Add some vertical space after the columns of daily data
 st.markdown("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
 
-#### Alternative Icon design (smaller boxes - all side by side) ####
+######## Icons Version 2: Smaller weather icons design and all side by side (for bigger screens) ########
+## -> Activate Version 2 by toggling between block commants of Version 1 and 2
+
 # st.markdown("")
 
 # st.markdown("""
@@ -238,25 +252,27 @@ st.markdown("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
 # # Add some vertical space after the columns of daily data
 # st.markdown("<div style='margin-bottom: 40px;'></div>", unsafe_allow_html=True)
 
-###### Icons end ######
+######## End Weather ICONS ########
 
+# print selected date and state
 st.markdown(f"**Currently Selected Date:** {date_choice}")
 st.markdown(f"**Currently Selected State/Region:** {state_choice}")
 st.markdown("<hr>", unsafe_allow_html=True)
-
 
 # Creating the columns layout for the UI with adjusted ratios for responsiveness
 # text input first level
 col1, col2 = st.columns([1.8, 1], vertical_alignment="top")
 
 with col1:
-    # Add a description for the energy forecast plot
+    # Add a description for the bokeh electricity forecast plot
     st.markdown("### Daily Electricity Production Forecast")
     st.markdown("Predicted daily production vs. average daily consumption of renewable electricity (wind and solar) based on current weather forecast and model predictions.")
     st.markdown("**Daily Values for:** Germany")
 with col2:
+    # Add a description for the approximation of electricity production comparison with households
     st.markdown("### Total Households Powered")
     st.markdown("Estimated equivalent of 2-person households that could be powered by the daily wind and solar electricity.")
+    # add selected date
     st.markdown(f"**Currently Selected Date:** {date_choice}")
     st.markdown("")
 
@@ -264,15 +280,18 @@ with col2:
 col1, col2 = st.columns([1.8, 1], vertical_alignment="center")
 
 with col1:
-
+    # create bokeh electricity production plot
+    # see bokeh_plot.py for more information
     pred_cons = generate_energy_forecast_plot(predictions_df, st.session_state.consumption_df)
     st.bokeh_chart(pred_cons, use_container_width=True)
 
 
 with col2:
-    # how many 2 person households could be powered with the daily amount of produced wind and solar electricity 
+    # how many 2 person households could be powered with the daily amount of produced wind and solar electricity (rough approximation)
+    # see household_calc.py for more information 
     total_households_latest = household(predictions_df, date_choice)
 
+    # box style for presenting houshold calculation
     st.markdown(f"""
         <div style='border: 1px solid #ddd; padding: 33px; display: flex; flex-direction: column; align-items: center; justify-content: center;'>
             <div style='display: flex; align-items: center;'>
@@ -310,17 +329,20 @@ with col2:
 col1, col2 = st.columns([1.8, 1], vertical_alignment="center")
     
 with col1:
-
+    # add selected date
     st.markdown(f"**Currently Selected Date:** {date_choice}")
     # create the map and add spinner for loading time
+    # see folium_map.py for more information
     with st.spinner('Calculating predictions, please wait...'):
         m = create_map(geo_df, date_choice, st.session_state.df_offshore)
     # this activates the map
     folium_static(m, width=500, height=500) # , width=500, height=500
 
 with col2:
-
+    # add selected date
     st.markdown(f"**Currently Selected Date:** {date_choice}")
+    # create the co2 savings plot and add spinner for loading time
+    # see co2_visual.py for more information
     with st.spinner('Calculating predictions, please wait...'):
         emissions = saved_emissions(predictions_df, date_choice)
     st.bokeh_chart(emissions, use_container_width=True)
@@ -328,10 +350,13 @@ with col2:
 st.markdown("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
 
 st.markdown("<hr>", unsafe_allow_html=True)
-# Federal State Production Plot
+# add federal state production plot below the columns
 st.markdown("### Daily Electricity Production by State")
 st.markdown("Electricity production for all predicted days and the chosen federal state or offshore location.")
+# add selected federal state 'state_choice'
 st.markdown(f"**Currently Selected State/Region:** {state_choice}")
+# create the federal state contribution plot and add spinner for loading time
+# see fed_state_bokeh.py for more information
 with st.spinner('Calculating predictions, please wait...'):
     fed_plot = create_fed_state_production_plot(geo_df, state_choice, st.session_state.df_offshore)
 st.bokeh_chart(fed_plot, use_container_width=True)

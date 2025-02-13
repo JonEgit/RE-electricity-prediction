@@ -5,7 +5,23 @@ import pandas as pd
 
 
 def geo_pred(gdf, predictions_df):
+    """Calculates federal state contributions of wind and solar electricity based on predicted electricity production 
+    and the nominal installed capacity of wind and pv power plants per federal state.
 
+    This function:
+    - Computes wind and solar electricity contributions per federal state for each day.
+    - Uses percentage-based distribution per federal state (as of november 2024) from `gdf` to allocate predicted wind and solar electricity.
+    - Transposes the data so that each row represents a day and each column represents a federal state.
+    - Merges the computed contributions back into the input GeoDataFrame.
+
+    Args:
+        gdf (gpd.GeoDataFrame): GeoDataFrame containing regional boundaries and percentage-based 
+            wind and solar electricity contributions.
+        predictions_df (pd.DataFrame): DataFrame containing daily predicted wind and solar electricity production.
+
+    Returns:
+        gpd.GeoDataFrame: Updated GeoDataFrame with wind and solar contributions added for each day.
+    """
     # Create new DataFrames to store the contributions per day for each region for wind and solar
     wind_contributions = pd.DataFrame()
     solar_contributions = pd.DataFrame()

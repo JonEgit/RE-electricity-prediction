@@ -5,6 +5,23 @@ import pandas as pd
 # External script to create the offshore dataframe
 @st.cache_data
 def create_offshore_dataframe(predictions_df):
+    """Generates a DataFrame with offshore wind (and solar) electricity contributions per day.
+
+    This function:
+    - Creates a base DataFrame for offshore wind and solar production of electricity in the North Sea and Baltic Sea.
+    - Iterates through the provided `predictions_df` to compute offshore wind and solar contributions for each date.
+    - Combines all calculated contributions into a final DataFrame.
+
+    Args:
+        predictions_df (pd.DataFrame): DataFrame containing daily predicted wind and solar electricity production.
+
+    Returns:
+        pd.DataFrame: Offshore electricity contributions per region (`north_sea`, `baltic_sea`) with calculated 
+                      daily values for wind and solar electricity.
+    """
+
+    # this data needed to be added manually since it wasn't referenced to in the nominal capacity geo_df 
+    # source: Bundesnetzagentur as of november 2024)
     offshore = {
         'region': ['north_sea', 'baltic_sea'],
         'solar_pv': [0, 0],

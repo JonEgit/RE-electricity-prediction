@@ -1,8 +1,25 @@
 ## equal 2-person household electricity need
 
 def household(predictions_df, date_choice):
+    """Calculates the equivalent number of households which could be supplied by renewable electricity production on a given day.
+
+    This function:
+    - Converts predicted wind and solar electricity production from GWh to kWh.
+    - Estimates the number of households that could be supplied with the produced electricity.
+    - Returns the total number of households (in millions, rounded) for a specific date.
+
+    Args:
+        predictions_df (pd.DataFrame): DataFrame containing predicted wind and solar electricity production 
+                                       with 'windpower' and 'solar_pv' columns.
+        date_choice (str): Date in the format '%d/%m/%y' for which the household equivalent is calculated.
+
+    Returns:
+        int: Estimated number of households (in millions) supplied by renewable electricity on the selected day.
+    """
+    
     GW_TO_KW = 1_000_000  # Conversion factor from Gwh to kWh
-    AVERAGE_HOUSEHOLD_CONSUMPTION_PER_DAY = 3470 / 365  # kWh per day per household
+    # kWh per day per 2-person-household in average (this is a rough approximation)
+    AVERAGE_HOUSEHOLD_CONSUMPTION_PER_DAY = 3470 / 365
 
     df = predictions_df.copy()
 

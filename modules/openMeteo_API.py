@@ -12,6 +12,25 @@ import streamlit as st
 
 # Function to fetch weather forecast data from OpenMeteo API
 def get_weather_forecast(days, past_days):
+    """Fetches daily weather forecasts for multiple cities and offshore locations from the Open-Meteo API.
+
+    Retrieves temperature, wind, precipitation, and solar radiation data for a set of predefined cities.
+    Supports both historical (`past_days`) and future (`days`) forecasts. Uses caching and retries to 
+    handle API failures.
+
+    Args:
+        days (int): Number of future days to retrieve weather data for.
+        past_days (int): Number of past days to retrieve historical weather data.
+
+    Returns:
+        pd.DataFrame: Daily weather data with city names, dates, and meteorological variables.
+
+    Raises:
+        ValueError: If the response lacks expected weather data.
+        requests.RequestException: For network-related issues.
+        Exception: For unexpected errors during data retrieval.
+    """
+
     # Setup the Open-Meteo API client with cache and retry on error
     cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
     retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
@@ -86,10 +105,22 @@ def get_weather_forecast(days, past_days):
 
 # Function to determine if data needs to be updated
 def refresh_data_if_needed():
+    """Ensures that weather data is updated once per day.
+
+    Checks if new weather data needs to be fetched based on the current date. If an 
+    update is required, it retrieves new data using `get_weather_forecast` and updates 
+    Streamlit's session state.
+
+    Modifies:
+        - `st.session_state.weather_data`: Stores the latest weather data.
+        - `st.session_state.last_fetch_date`: Stores the last data retrieval date.
+    """
+    
     current_date = datetime.datetime.now().date()
 
     # Check if 'last_fetch_date' is in session_state
     if 'last_fetch_date' not in st.session_state or st.session_state.last_fetch_date != current_date:
         # If date has changed or data not fetched yet, load new data
+        # standard setting is to get 7 predicted and 3 past days
         st.session_state.weather_data = get_weather_forecast(7,3)
         st.session_state.last_fetch_date = current_date
