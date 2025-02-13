@@ -60,4 +60,6 @@ The goal of this repository is to present the final product, it contains the fol
     1. automated request for present data for of the same set of meteorological variables of germany for 11 locations to create a mean value for each day of 3 historic and 7 predicted days for moedel predictions (see openMeteo_API.py)
 1. Esri open data portal: https://opendata-esridech.hub.arcgis.com              
     1. Bundesländergrenzen 2022 (geojson)
+1. Umweltbundesamt 2022: https://www.umweltbundesamt.de/sites/default/files/medien/361/dokumente/co2_ef_liste_2022_brennstoffe_und_industrie_final.xlsx
+    1. CO_2 Emission values for energy carriers
 
