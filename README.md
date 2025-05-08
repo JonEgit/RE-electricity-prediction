@@ -4,14 +4,14 @@
 Interactive streamlit dashboard which presents a set of visualizations of the prediction of electricity production by wind and photovoltaics in germany.
 
 ## Project Summary
-As part of a 3 month data science and AI bootcamp at neuefische, students were required to create and present a final machine learning capstone project of their choice. For this project i implemented machine learning tools to predict electricity produced by wind an pv in germany based on weather forecast data. The repository at hand presents the code for the creation of the model and the implementation of the streamlit dashboard. The preceeding EDA and preprocessing process of the necessary data which i conducted is however not presented in this repository but will be added in the future.
+As part of a 3 month data science and AI bootcamp at neuefische, students were required to create and present a final machine learning capstone project of their choice. For this project i implemented machine learning tools to predict electricity produced by wind an pv in germany based on weather forecast data. The repository at hand presents the code for the creation of the model and the implementation of the streamlit dashboard. Initial EDA and raw data preprocessing were conducted separately and are not included in this repository - an addition is planned for a future update.
 
 The project implementation followed these steps:
 1. Data akquisition
 1. Created an automated openMeteo API
 1. Data preprocessing
 1. Exploratory data analysis
-1. Data cleaning and preperation for modeling (Scaling, Feature importance, ...) 
+1. Data cleaning and preparation for modeling (Scaling, Feature importance, ...) 
 1. Comparison of different modelarchitectures and systems (multioutput vs singleoutput)
 1. Model training
 1. Model optimization and hyperparametertuning
@@ -22,7 +22,7 @@ The project implementation followed these steps:
 1. Finalized dashboard
 
 ## Content of this repository:
-The goal of this repository is to present the final product, it contains the following parts for its implementaion:
+The goal of this repository is to present the final product, it contains the following parts for its implementation:
 1. Already cleaned data for modeling and dashboard creation (no external data download required)
 1. Jupyter Notebook to train and recreate the final model and to save it in the given folderstructure
 1. Python scripts: API and visualization functions
